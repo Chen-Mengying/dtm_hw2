@@ -103,26 +103,30 @@ def is_sunny(dataset, px, py, dt):
 
     # 2. get the height of point v ( v can be any point in the segment of p_sun)
     # and point g (g is the corresponding ground point to v)
+    # breakpoint()
     line = np.multiply(re, n1)  # get the height value for raster_line
     n2 = np.where(line != dataset.nodatavals[0], line, -9999)  # no data points on the line get value -9999
+
     idx = np.where(re == 1)
 
     height_g = []
     for i in range(len(idx[0])):
         height_g.append(n2[idx[0][i]][idx[1][i]])
-
+    # breakpoint()
     height_v = []
     for i in range(len(idx[0])):
-        vh = height_p + [(dataset.xy(idx[0][i], idx[1][i])[0] - px) * abs(sun_al - height_p) / abs(sx - px)]
+        vh = height_p + abs(dataset.xy(idx[0][i], idx[1][i])[0] - px) * (sun_al - height_p) / (sx - px)
         height_v.append(vh)
-    # breakpoint()
+    breakpoint()
 
     j = 0
     while j <= len(idx[0]):
         if height_v <= height_g:
             return False
         else:
+            j = j + 1
             continue
+
     return True
 
 
@@ -130,7 +134,7 @@ def main():
     # -- this gives you a Rasterio dataset
     # -- https://rasterio.readthedocs.io/en/latest/quickstart.html
     d = rasterio.open('../ahn3_data/ahn3_dsm50cm_bk_small.tif')
-    px, py, dt = 85219.70, 446856.84, '2022-08-12 13:32'
+    px, py, dt = 85278.83, 447036.12, '2022-08-12 07:32'
     start_time = time.time()
     re = is_sunny(d, px, py, dt)
     end_time = time.time()
